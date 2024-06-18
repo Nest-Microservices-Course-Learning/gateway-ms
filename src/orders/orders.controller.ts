@@ -19,14 +19,14 @@ import { CreateOrderDto } from './dto';
 @Controller('orders')
 export class OrdersController {
   constructor(
-    @Inject(NATS_SERVICE) private readonly ordersClient: ClientProxy,
+    @Inject(NATS_SERVICE) private readonly client: ClientProxy,
   ) {}
 
   @Get()
   async findAll(@Query() orderPaginationDto: OrderPaginationDto) {
     try {
       const orders = await firstValueFrom(
-        this.ordersClient.send('findAllOrders', orderPaginationDto),
+        this.client.send('findAllOrders', orderPaginationDto),
       );
       return orders;
     } catch (error) {
@@ -42,7 +42,7 @@ export class OrdersController {
   ) {
     try {
       const order = await firstValueFrom(
-        this.ordersClient.send('findAllOrders', {
+        this.client.send('findAllOrders', {
           ...statusDto,
           ...paginationDto,
         }),
@@ -57,7 +57,7 @@ export class OrdersController {
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
     try {
       const order = await firstValueFrom(
-        this.ordersClient.send('findOneOrder', {
+        this.client.send('findOneOrder', {
           id: id,
         }),
       );
@@ -70,7 +70,7 @@ export class OrdersController {
   @Post()
   create(@Body() createOrderDto: CreateOrderDto) {
     try {
-      return this.ordersClient.send('createOrder', createOrderDto);
+      return this.client.send('createOrder', createOrderDto);
     } catch (error) {
       throw new RpcException(error);
     }
@@ -83,7 +83,7 @@ export class OrdersController {
   ) {
     try {
       const order = await firstValueFrom(
-        this.ordersClient.send('changeStatusOrder', { id, ...statusDto }),
+        this.client.send('changeStatusOrder', { id, ...statusDto }),
       );
       return order;
     } catch (error) {
